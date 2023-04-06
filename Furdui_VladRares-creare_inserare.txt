@@ -1,0 +1,495 @@
+CREATE TABLE SPONSOR(
+    cod_sponsor number(5) PRIMARY KEY,
+    nume varchar2(46),
+    suma number(5)
+); 
+
+create sequence seq_sponsor
+start with 9
+increment by 1
+nomaxvalue
+nocycle
+nocache;
+
+INSERT INTO SPONSOR VALUES(seq_sponsor.nextval, 'Shark', 20000);
+INSERT INTO SPONSOR VALUES(seq_sponsor.nextval, 'Liqui Moly', 30000);
+INSERT INTO SPONSOR VALUES(seq_sponsor.nextval, 'Monster Energy', 40000);
+INSERT INTO SPONSOR VALUES(seq_sponsor.nextval, 'Petronas', 45000);
+INSERT INTO SPONSOR VALUES(seq_sponsor.nextval, 'Red Bull', 1000);
+INSERT INTO SPONSOR VALUES(seq_sponsor.nextval, 'Tissot', 60000);
+INSERT INTO SPONSOR VALUES(seq_sponsor.nextval, 'Motul', 80000);
+INSERT INTO SPONSOR VALUES(seq_sponsor.nextval, 'Michelin', 3000);
+
+commit; 
+select * from SPONSOR; 
+
+
+CREATE TABLE CIRCUIT(
+    cod_circuit number(5) PRIMARY KEY,
+    nume varchar2(100),
+    lungime number(6,2),
+    viraje number(2) 
+);
+
+
+create sequence seq_circuit
+start with 300
+increment by 10
+nomaxvalue
+nocycle
+nocache;
+
+INSERT INTO CIRCUIT VALUES(seq_circuit.nextval,'Circuito de Jerez - Angel Nieto', 4.27, 16);
+INSERT INTO CIRCUIT VALUES(seq_circuit.nextval,'Autodromo Internazionale del Mugello', 5.24, 15);
+INSERT INTO CIRCUIT VALUES(seq_circuit.nextval,'Sachsenring', 3.67, 13);
+INSERT INTO CIRCUIT VALUES(seq_circuit.nextval,'Silverstone Circuit', 5.89, 18);
+INSERT INTO CIRCUIT VALUES(seq_circuit.nextval,'Red Bull Ring - Spielberg', 4.31, 10);
+INSERT INTO CIRCUIT VALUES(seq_circuit.nextval,'Phillip Island', 	4.44, 12);
+INSERT INTO CIRCUIT VALUES(seq_circuit.nextval,'Sepang International Circuit',5.54, 15);
+commit;
+select * from CIRCUIT;
+
+
+
+create sequence seq_gp
+start with 1000
+increment by 1
+nomaxvalue
+nocycle
+nocache;
+
+CREATE TABLE GRAND_PRIX(
+    cod_gp number(5) PRIMARY KEY,
+    cod_circuit number(5),
+    cod_sponsor number(5),
+    nume varchar2(46),
+    data date,
+    CONSTRAINT FK_grandPrix_Circuit FOREIGN KEY (cod_circuit)
+            REFERENCES CIRCUIT(cod_circuit) ON DELETE CASCADE,
+    CONSTRAINT FK_grandPrix_Sponsor FOREIGN KEY (cod_sponsor)
+            REFERENCES SPONSOR(cod_sponsor) ON DELETE CASCADE
+);
+
+INSERT INTO GRAND_PRIX VALUES(seq_gp.nextval,300, 9, 'Gran Premio Red Bull de España', TO_DATE('10/05/1970', 'DD/MM/YYYY'));
+INSERT INTO GRAND_PRIX VALUES(seq_gp.nextval,310, 10, 'Gran Premio d’Italia Oakley', TO_DATE('12/05/1980', 'DD/MM/YYYY'));
+INSERT INTO GRAND_PRIX VALUES(seq_gp.nextval,320, 11, 'Liqui Moly Motorrad Grand Prix Deutschland', TO_DATE('10/09/1990', 'DD/MM/YYYY'));
+INSERT INTO GRAND_PRIX VALUES(seq_gp.nextval,330, 12, 'Monster Energy British Grand Prix', TO_DATE('30/05/1960', 'DD/MM/YYYY'));
+INSERT INTO GRAND_PRIX VALUES(seq_gp.nextval,340, 13, 'Motorrad Grand Prix von Österreich', TO_DATE('10/03/1975', 'DD/MM/YYYY'));
+INSERT INTO GRAND_PRIX VALUES(seq_gp.nextval,350, 14, 'Animoa Brands Australian Motorcycle Grand Prix', TO_DATE('14/05/2003', 'DD/MM/YYYY'));
+INSERT INTO GRAND_PRIX VALUES(seq_gp.nextval,360, 15, 'PETRONAS Grand Prix of Malaysia', TO_DATE('20/02/2005', 'DD/MM/YYYY'));
+
+select * from GRAND_PRIX;
+commit;
+
+
+
+CREATE TABLE FANI(
+    cod_fan number(5) PRIMARY KEY,
+    cod_gp number(5),
+    nume varchar2(46),
+    prenume varchar2(46),
+    nationalitate varchar2(23),
+    CONSTRAINT FK_Fani_Circuit FOREIGN KEY (cod_gp)
+            REFERENCES GRAND_PRIX(cod_gp) ON DELETE CASCADE
+);
+commit;
+create sequence seq_fani
+INCREMENT by 1
+START WITH 50
+MINVALUE 50
+MAXVALUE 90000
+NOCYCLE;
+
+INSERT INTO FANI VALUES(seq_fani.nextval,1000, 'Juan', 'Sebastian', 'Spania');
+INSERT INTO FANI VALUES(seq_fani.nextval,1000, 'Marcos', 'Alonso', 'Spania');
+INSERT INTO FANI VALUES(seq_fani.nextval,1001, 'Mohamed', 'Salah', 'Egipt');
+INSERT INTO FANI VALUES(seq_fani.nextval,1001, 'Virgil', 'Van Dijk', 'Olanda');
+INSERT INTO FANI VALUES(seq_fani.nextval,1002, 'Jurgen', 'Klopp', 'Germania');
+INSERT INTO FANI VALUES(seq_fani.nextval,1003, 'Lewis', 'Hamilton', 'Anglia');
+INSERT INTO FANI VALUES(seq_fani.nextval,1004, 'Max', 'Verstappen', 'Olanda');
+INSERT INTO FANI VALUES(seq_fani.nextval,1006, 'Horia', 'Brenciu', 'Romania');
+INSERT INTO FANI VALUES(seq_fani.nextval,1006, 'John', 'Cena', 'American');
+INSERT INTO FANI VALUES(seq_fani.nextval,1007, 'Steve', 'Irwin', 'Australian');
+select * from FANI;
+
+
+CREATE TABLE CURSE(
+    cod_cursa number(5) PRIMARY KEY,
+    cod_gp number(5),
+    lap number(2),
+    CONSTRAINT FK_Curse_GP FOREIGN KEY (cod_gp)
+            REFERENCES GRAND_PRIX(cod_gp) ON DELETE CASCADE   
+);
+select * from GRAND_PRIX;
+
+create sequence seq_curse
+start with 2000
+increment by 100
+nomaxvalue
+nocycle
+nocache;
+
+
+INSERT INTO CURSE VALUES (seq_curse.nextval, 1000, 22);
+INSERT INTO CURSE VALUES (seq_curse.nextval, 1001, 26);
+INSERT INTO CURSE VALUES (seq_curse.nextval, 1002, 24);
+INSERT INTO CURSE VALUES (seq_curse.nextval, 1003, 25);
+INSERT INTO CURSE VALUES (seq_curse.nextval, 1004, 21);
+INSERT INTO CURSE VALUES (seq_curse.nextval, 1006, 29);
+INSERT INTO CURSE VALUES (seq_curse.nextval, 1007, 18);
+select * from CURSE;
+commit;
+
+drop table MOTO3;
+CREATE TABLE MOTOGP(
+    cod_cursa number(5) PRIMARY KEY,
+    castigator varchar2(46),
+    ora number(4, 2)
+);
+
+INSERT INTO MOTOGP VALUES (2000, 'Fabio Quartararo', 16.30);
+INSERT INTO MOTOGP VALUES (2100, 'Pecco Bagnaia', 16.00);
+INSERT INTO MOTOGP VALUES (2200, 'Pecco Bagnaia', 16.00);
+INSERT INTO MOTOGP VALUES (2300, 'Maverick Vinales', 15.00);
+INSERT INTO MOTOGP VALUES (2400, 'Valentino Rossi', 15.00);
+INSERT INTO MOTOGP VALUES (2500, 'Fabio Quartararo', 17.30);
+INSERT INTO MOTOGP VALUES (2600, 'Miguel Oliveira', 14.30);
+select * from MOTOGP;
+
+
+CREATE TABLE MOTO2(
+    cod_cursa number(5) PRIMARY KEY,
+    castigator varchar2(46),
+    ora number(4, 2)
+);
+
+INSERT INTO MOTO2 VALUES (2000, 'Sam Lowes', 14.20);
+INSERT INTO MOTO2 VALUES (2100, 'Ai Ogura', 14.00);
+INSERT INTO MOTO2 VALUES (2200, 'Joe Roberts', 13.00);
+INSERT INTO MOTO2 VALUES (2300, 'Sam Lowes', 13.00);
+INSERT INTO MOTO2 VALUES (2400, 'Cameron Beaubier', 14.00);
+INSERT INTO MOTO2 VALUES (2500, 'Simone Corsi', 15.30);
+INSERT INTO MOTO2 VALUES (2600, 'Joe Roberts', 13.30);
+
+select * from MOTO2;
+
+CREATE TABLE MOTO3(
+    cod_cursa number(5) PRIMARY KEY,
+    castigator varchar2(46),
+    ora number(4, 2)
+);
+
+INSERT INTO MOTO3 VALUES (2000, 'Jaume Masia', 11.30);
+INSERT INTO MOTO3 VALUES (2100, 'Dennis Foggia', 12.00);
+INSERT INTO MOTO3 VALUES (2200, 'Dennis Foggia', 11.00);
+INSERT INTO MOTO3 VALUES (2300, 'Xavier Artigas', 12.00);
+INSERT INTO MOTO3 VALUES (2400, 'Ayumu Sasaki', 11.00);
+INSERT INTO MOTO3 VALUES (2500, 'Deniz Öncü', 10.30);
+INSERT INTO MOTO3 VALUES (2600, 'Izan Guevara', 10.30);
+select * from MOTO3;
+
+commit;
+
+CREATE TABLE STEWARD (
+    cod_steward number(5) PRIMARY KEY,
+    nume varchar2(46),
+    prenume varchar2(46),
+    viraj number(2)
+    
+);
+
+create sequence seq_steward
+INCREMENT by 400
+START WITH 4000
+MAXVALUE 90000
+NOCYCLE;
+
+INSERT INTO STEWARD VALUES(seq_steward.nextval, 'Jack','Nicholson',13);
+INSERT INTO STEWARD VALUES(seq_steward.nextval, 'Marlon','Brando',9);
+INSERT INTO STEWARD VALUES(seq_steward.nextval, 'Al','Pacino',4);A
+INSERT INTO STEWARD VALUES(seq_steward.nextval, 'Dustin','Hoffman',8);
+INSERT INTO STEWARD VALUES(seq_steward.nextval, 'Tom','Hanks',7);
+INSERT INTO STEWARD VALUES(seq_steward.nextval, 'Anthony','Hopkins',10);
+select * from STEWARD;
+commit;
+
+
+CREATE TABLE TRANSMISIUNE(
+    cod_transmisiune number(5) PRIMARY KEY,
+    nume varchar2(46),
+    tara varchar2(30)
+);
+
+create sequence seq_transmisiune
+INCREMENT by 6
+START WITH 366
+MAXVALUE 90000
+NOCYCLE;
+
+INSERT INTO TRANSMISIUNE VALUES (seq_transmisiune.nextval, 'DAZN', 'Spaia');
+INSERT INTO TRANSMISIUNE VALUES (seq_transmisiune.nextval, 'SKY', 'Anglia');
+INSERT INTO TRANSMISIUNE VALUES (seq_transmisiune.nextval, 'EUROSPORT', 'Romania');
+INSERT INTO TRANSMISIUNE VALUES (seq_transmisiune.nextval, 'BEIN', 'Franta');
+INSERT INTO TRANSMISIUNE VALUES (seq_transmisiune.nextval, 'RAI', 'Italia');
+INSERT INTO TRANSMISIUNE VALUES (seq_transmisiune.nextval, 'ESPN', 'America');
+
+CREATE TABLE ABONAMENT(
+    cod_transmisiune number(5) PRIMARY KEY,
+    perioada date
+);
+INSERT INTO ABONAMENT VALUES(366, TO_DATE('10/05/2022', 'DD/MM/YYYY'));
+INSERT INTO ABONAMENT VALUES(372, TO_DATE('15/06/2022', 'DD/MM/YYYY'));
+INSERT INTO ABONAMENT VALUES(378, TO_DATE('20/07/2022', 'DD/MM/YYYY'));
+select * from ABONAMENT;
+
+CREATE TABLE PPV(
+    cod_transmisiune number(5) PRIMARY KEY,
+    pret number(4)
+);
+
+
+INSERT INTO PPV VALUES (384, 100);
+INSERT INTO PPV VALUES (390, 200);
+INSERT INTO PPV VALUES (396, 1200);
+
+select * from PPV;
+commit;
+
+CREATE TABLE ECHIPE(
+    cod_echipa number(5) PRIMARY KEY,
+    nume varchar2(100)
+);
+
+create sequence seq_echipe
+start with 7000
+increment by 20
+nomaxvalue
+nocycle
+nocache;
+
+INSERT INTO ECHIPE VALUES(seq_echipe.nextval, 'Aprilia Racing');
+INSERT INTO ECHIPE VALUES(seq_echipe.nextval, 'Ducati Lenovo Team');
+INSERT INTO ECHIPE VALUES(seq_echipe.nextval, 'Monster Energy Yamaha MotoGP');
+INSERT INTO ECHIPE VALUES(seq_echipe.nextval, 'Gresini Racing MotoGP');
+INSERT INTO ECHIPE VALUES(seq_echipe.nextval, 'Tech3 KTM Factory Racing');
+INSERT INTO ECHIPE VALUES(seq_echipe.nextval, 'LCR Honda');
+
+select * from ECHIPE;
+commit;
+
+CREATE TABLE UZINA(
+    cod_echipa number(5) PRIMARY KEY,
+    locatie varchar2(30)
+);
+
+INSERT INTO UZINA VALUES (7000, 'Aprilia');
+INSERT INTO UZINA VALUES (7020, 'Bologna');
+INSERT INTO UZINA VALUES (7040, 'Hamamatsu');
+
+select * from UZINA;
+
+CREATE TABLE PRIVAT(
+    cod_echipa number(5) PRIMARY KEY,
+    motorizare varchar2(30)
+);
+
+INSERT INTO PRIVAT VALUES (7000, 'Ducati');
+INSERT INTO PRIVAT VALUES (7020, 'KTM');
+INSERT INTO PRIVAT VALUES (7040, 'Honda');
+
+select * from PRIVAT; 
+commit; 
+
+
+
+CREATE TABLE INGINERI(
+    cod_inginer number(5) PRIMARY KEY,
+    nume varchar2(46),
+    prenume varchar2(46),
+    post varchar2(30)
+);
+
+create sequence seq_ing
+start with 314
+increment by 271
+nomaxvalue
+nocycle
+nocache;
+
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'George', 'Stephenson', 'Motor');
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'Elon', 'Musk', 'Carena');
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'Nikola', 'Tesla', 'Aerodinamic');
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'Nikolaus', 'Otto', 'Aerodinamic');
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'Thomas', ' Edison', 'Carena');
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'Gottlieb', 'Daimler', 'Electronic');
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'Tommy', 'Flowers', 'Electronic');
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'Gustave', 'Eiffel', 'Motor');
+INSERT INTO INGINERI VALUES (seq_ing.nextval, 'James', 'Watt', 'Motor');
+
+select * from INGINERI;
+commit;
+
+
+CREATE TABLE PILOT(
+    cod_pilot number(5) PRIMARY KEY,
+    nume varchar2(46),
+    prenume varchar2(46),
+    podium number(3)
+);
+
+create sequence seq_pilot
+INCREMENT by 50
+START WITH 10000
+MAXVALUE 90000
+NOCYCLE;
+
+
+
+INSERT INTO PILOT VALUES (seq_pilot.nextval, 'Aleix','Esparago',3);
+INSERT INTO PILOT VALUES (seq_pilot.nextval, 'Pecco','Bagnaia',10);
+INSERT INTO PILOT VALUES (seq_pilot.nextval, 'Fabio','Quartararo',5);
+INSERT INTO PILOT VALUES (seq_pilot.nextval, 'Enea','Bastianini',7);
+INSERT INTO PILOT VALUES (seq_pilot.nextval, 'Remy','Gardner',1);
+INSERT INTO PILOT VALUES (seq_pilot.nextval, 'Alex','Marquez',4);
+select * from PILOT;
+commit;
+
+
+
+
+
+CREATE TABLE CONTRACT(
+    cod_echipa number(5),
+    cod_pilot number(5),
+    suma number(7),
+    perioada date,
+
+    PRIMARY KEY (cod_echipa, cod_pilot),
+    CONSTRAINT FK_Contract_Echipa FOREIGN KEY (cod_echipa)
+            REFERENCES ECHIPE(cod_echipa) ON DELETE CASCADE,
+    CONSTRAINT FK_Contract_Pilot FOREIGN KEY (cod_pilot)
+            REFERENCES PILOT(cod_pilot) ON DELETE CASCADE
+);
+
+INSERT INTO CONTRACT VALUES (7000, 10000, 150000, TO_DATE('31/07/2022', 'DD/MM/YYYY'));
+INSERT INTO CONTRACT VALUES (7020, 10050, 250000, TO_DATE('31/07/2022', 'DD/MM/YYYY'));
+INSERT INTO CONTRACT VALUES (7040, 10100, 350000, TO_DATE('31/07/2022', 'DD/MM/YYYY'));
+INSERT INTO CONTRACT VALUES (7060, 10150, 750000, TO_DATE('31/12/2022', 'DD/MM/YYYY'));
+INSERT INTO CONTRACT VALUES (7080, 10200, 550000, TO_DATE('31/12/2022', 'DD/MM/YYYY'));
+INSERT INTO CONTRACT VALUES (7100, 10250, 650000, TO_DATE('31/12/2022', 'DD/MM/YYYY')); 
+select * from CONTRACT
+commit;  
+
+
+
+CREATE TABLE CURSE_TRANSMISIUNE(
+    cod_cursa number(5),
+    cod_transmisiune number(5),
+    PRIMARY KEY (cod_cursa, cod_transmisiune),
+    CONSTRAINT FK_Curse_Transmisiune FOREIGN KEY (cod_cursa)
+            REFERENCES CURSE(cod_cursa) ON DELETE CASCADE,
+    CONSTRAINT FK_Transmisiune_Curse FOREIGN KEY (cod_transmisiune)
+            REFERENCES TRANSMISIUNE(cod_transmisiune) ON DELETE CASCADE
+);
+
+
+
+INSERT INTO CURSE_TRANSMISIUNE VALUES( 2000,366 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES( 2000, 372);
+INSERT INTO CURSE_TRANSMISIUNE VALUES(2100 ,378 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES( 2100,384 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES( 2100,390 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES( 2200,396 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES(2300 ,366 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES( 2300,372 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES(2400 , 378);
+INSERT INTO CURSE_TRANSMISIUNE VALUES(2400 ,384 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES( 2500,390 );
+INSERT INTO CURSE_TRANSMISIUNE VALUES( 2600, 396);
+select * from CURSE_TRANSMISIUNE;
+commit;
+select* from STEWARD;
+select* from CURSE;
+
+
+
+select * from CURSE;
+CREATE TABLE STEWARD_asigura_CURSE(
+    
+    cod_steward number(5),
+    cod_cursa number(5),
+    PRIMARY KEY (cod_cursa,  cod_steward),
+    CONSTRAINT FK_Curse_Steward FOREIGN KEY (cod_cursa)
+            REFERENCES CURSE(cod_cursa) ON DELETE CASCADE,
+    CONSTRAINT FK_Steward_Curse FOREIGN KEY ( cod_steward)
+            REFERENCES  steward( cod_steward) ON DELETE CASCADE
+);
+
+INSERT INTO STEWARD_asigura_CURSE VALUES(4000, 2000);
+INSERT INTO STEWARD_asigura_CURSE VALUES(4000, 2100);
+INSERT INTO STEWARD_asigura_CURSE VALUES(4400, 2200);
+INSERT INTO STEWARD_asigura_CURSE VALUES(4400, 2300);
+INSERT INTO STEWARD_asigura_CURSE VALUES(4800, 2400);
+INSERT INTO STEWARD_asigura_CURSE VALUES(4800, 2500);
+INSERT INTO STEWARD_asigura_CURSE VALUES(5000, 2600);
+INSERT INTO STEWARD_asigura_CURSE VALUES(5000, 2000);
+INSERT INTO STEWARD_asigura_CURSE VALUES(5200, 2100);
+INSERT INTO STEWARD_asigura_CURSE VALUES(5200, 2200);
+INSERT INTO STEWARD_asigura_CURSE VALUES(5600, 2300);
+INSERT INTO STEWARD_asigura_CURSE VALUES(5600, 2400);
+INSERT INTO STEWARD_asigura_CURSE VALUES(6000, 2500);
+select * from STEWARD_asigura_CURSE;
+
+commit;
+
+CREATE TABLE FANI_participa_la_GRANDPRIX(
+    
+    cod_fan number(5),
+    cod_gp number(5),
+    PRIMARY KEY (cod_gp,  cod_fan),
+    CONSTRAINT FK_GP_Fani FOREIGN KEY (cod_gp)
+            REFERENCES GRAND_PRIX(cod_gp) ON DELETE CASCADE,
+    CONSTRAINT FK_FANI_GP FOREIGN KEY (cod_fan)
+            REFERENCES  FANI(cod_fan) ON DELETE CASCADE
+);
+
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (51, 1000);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (51, 1001);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (52, 1002);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (52, 1003);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (53, 1004);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (53, 1005);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (54, 1006);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (54, 1007);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (55, 1000);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (55, 1001);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (56, 1002);
+INSERT INTO FANI_participa_la_GRANDPRIX VALUES (57, 1003);
+commit;
+
+
+
+CREATE TABLE INGINERI_ECHIPE_CURSE(
+    cod_inginer number(5),
+    cod_cursa number(5),
+    cod_echipa number(5),
+    PRIMARY KEY (cod_inginer, cod_cursa,  cod_echipa),
+    CONSTRAINT FK_IEC_C FOREIGN KEY (cod_cursa)
+            REFERENCES CURSE(cod_cursa) ON DELETE CASCADE,
+    CONSTRAINT FK_IEC_I FOREIGN KEY (cod_inginer)
+            REFERENCES INGINERI(cod_inginer) ON DELETE CASCADE,
+    CONSTRAINT FK_IEC_E FOREIGN KEY (cod_echipa)
+            REFERENCES ECHIPE(cod_echipa) ON DELETE CASCADE
+); 
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(314, 2000, 7000);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(314, 2100, 7020);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(585, 2200, 7040);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(585, 2300, 7060);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(856, 2400, 7080);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(856, 2500, 7060);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(1398, 2600, 7040);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(1669, 2000, 7020);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(1940, 2100, 7000);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(2211, 2200, 7100);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(2211, 2300, 7100);
+INSERT INTO INGINERI_ECHIPE_CURSE VALUES(2482, 2400, 7020);

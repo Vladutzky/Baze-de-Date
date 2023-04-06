@@ -1,0 +1,171 @@
+--11 SĂ SE SELECTEZE SPONSORII GRAND PRIX-URILOR CARE AU CURSA DE MOTOGP CE ÎNCEPE DUPĂ 12.00 ȘI ARE FANI DIN OLANDA
+
+
+select * 
+from sponsor s, grand_prix g
+where s.cod_sponsor = g.cod_sponsor and g.cod_gp in
+(select cod_gp 
+from grand_prix 
+where cod_gp in (select cod_gp
+                from fani
+                where lower(nationalitate) like 'olanda') and cod_gp in (select cod_gp
+                                                                        from curse, motogp
+                                                                        where curse.cod_cursa = motogp.cod_cursa and ora > 12));
+                                                                        
+                                                                        
+
+
+--SĂ SE SELECTEZE TRANSMISIUNILE PPV ALE CURSELOR CE AU AVUT CEL MAI MARE NUMĂR DE FANI
+                 
+
+
+
+with aux as 
+    (select count(*) nr, cod_gp
+    from fani 
+    group by cod_gp)
+select distinct ppv.cod_transmisiune
+from ppv, transmisiune t, curse c, grand_prix gp, curse_transmisiune ct
+where ppv.cod_transmisiune = t.cod_transmisiune and ct.cod_cursa = c.cod_cursa and c.cod_gp = gp.cod_gp and ct.cod_transmisiune = t.cod_transmisiune 
+                    and gp.cod_gp in (select cod2
+                                    from (select count(cod_fan) nr, gp.cod_gp cod2
+                                        from grand_prix gp, fani f, aux
+                                        where f.cod_gp = gp.cod_gp and aux.cod_gp = f.cod_gp and nr = (select max(count(*)) from fani 
+                                                                                                        group by cod_gp)
+                                   group by gp.cod_gp));
+ 
+
+
+
+--SĂ SE SELECTEZE CURSELE CARE AU RAPORTUL LUNGIME/LAP MAI MARE DECÂT MEDIA ȘI NUMĂR IMPAR DE VOCALE ÎN NUME
+select c.cod_cursa, cr.nume 
+from curse c, circuit cr, grand_prix gp --603
+where c.cod_gp = gp.cod_gp and gp.cod_circuit = cr.cod_circuit and 
+    mod(length(gp.nume) - length(replace(replace(replace(replace(replace(lower(gp.nume), 'a', ''), 'e', ''), 'i', ''), 'o', ''), 'u', '')),2) = 1 
+    and nvl(lungime/lap, 0) = (select avg(lungime/lap)
+    from circuit cr2, grand_prix gp2, curse c2
+    where  gp2.cod_circuit = cr2.cod_circuit and cr2.cod_circuit = cr.cod_circuit and gp2.cod_gp = c2.cod_gp and gp2.cod_gp = gp.cod_gp);
+    
+    
+--SĂ SE SELECTEZE GRAND PRIX-URILE CARE NUMĂRUL DE FANI MAI MARE DECÂT 1, CELE CARE SE DESFĂȘOARĂ ÎN DECEMBRIE VOR FI AMÂNATE PENTRU MARTIE; IAR CELE DIN MAI PENTRU AUGUST    
+with aux as
+    (select f.cod_gp ch, count(f.cod_gp)
+    from grand_prix gp, fani f
+    where gp.cod_gp = f.cod_gp 
+    group by gp.cod_gp
+    having count(*) > 1)
+select distinct f.cod_gp, nvl(gp.nume, 'Inca nestabilit') as Nume, 
+    case extract(month from to_date(data))
+        when 12 then (add_months(data, 4)) 
+        when 5 then (add_months(data, 3)) 
+        else data
+    end as "Data modificata"
+from grand_prix gp, fani f,  aux
+where  gp.cod_gp = f.cod_gp and aux.ch = gp.cod_gp;
+    
+
+
+--SĂ SE NUMERE CÂȚI FANI ARE FIECARE ȚARĂ
+select nationalitate , 
+    decode(nationalitate, 'Spania', (select count(f.cod_fan) from fani f where nationalitate = 'Spania'),
+     'Egipt', (select count(f.cod_fan) from fani f where nationalitate = 'Egipt'),
+     'Olanda', (select count(f.cod_fan) from fani f where nationalitate = 'Olanda'),
+    'Germania', (select count(f.cod_fan) from fani f where nationalitate = 'Germania'),
+    'Romania', (select count(f.cod_fan) from fani f where nationalitate = 'Romania'),
+    'American', (select count(f.cod_fan) from fani f where nationalitate = 'American'),
+     'Australian', (select count(f.cod_fan) from fani f where nationalitate = 'Australian'),
+    'Anglia', (select count(f.cod_fan) from fani f where nationalitate = 'Anglia'), 0) as NrFani
+    from fani
+    group by nationalitate
+    order by decode(nationalitate, 'Spania', 1, 'Egipt', 2, 'Olanda', 3, 'Germania', 4, 'Romania', 5, 'American', 6, 'Australian', 7, 'Anglia', 8);
+                                                                                            
+                                                                                            
+---12
+--Să se șteargă toți sponsorii care nu sponsorizează un grand prix.
+DELETE FROM SPONSOR
+WHERE cod_sponsor not in (select s.cod_sponsor
+                            from sponsor s, grand_prix gp
+                            where s.cod_sponsor = gp.cod_sponsor);
+
+ ---.Să se modifice numărul de lapuri al fiecărei curse astfel încat lap count>20.
+UPDATE CURSE SET lap = 20
+WHERE cod_cursa in (select cod_cursa
+                    from curse
+                    where lap < 20);
+
+---Să se șteargă toate cursele de MOTO3 ce încep după ora 11.00.
+DELETE FROM MOTO3
+WHERE cod_cursa in (select cod_cursa 
+                    from moto3 m3
+                    where ora > 11);
+                    
+                    
+
+
+
+----14
+CREATE VIEW viz_1 
+AS select * from ingineri where cod_inginer not in (select cod_inginer from ingineri where lower(post) = 'motor');
+
+
+CREATE VIEW viz_fani 
+AS select count(cod_fan) nr, gp.cod_gp cod2
+                from grand_prix gp, fani f, (select count(*) nr, cod_gp
+                                            from fani 
+                                            group by cod_gp) aux
+                where f.cod_gp = gp.cod_gp and aux.cod_gp = f.cod_gp and nr = (select max(count(*)) from fani 
+                                                                                group by cod_gp)
+                group by gp.cod_gp;
+                
+CREATE VIEW viz_pilot
+AS select  * from pilot where mod(length(nume) - length(replace(replace(replace(replace(replace(lower(nume), 'a', ''), 'e', ''), 'i', ''), 'o', ''), 'u', '')),2) = 0;
+
+UPDATE viz_pilot SET nume = 'nume_nou'
+WHERE podium = (select max(podium)
+                from pilot
+                );
+commit;
+
+--15
+SELECT nume, prenume, podium
+FROM pilot 
+WHERE podium > (select avg(podium)
+                from pilot);
+
+CREATE INDEX ex_15
+ON pilot(nume, prenume);
+
+----16
+--SĂ SE SELECTEZE TOȚI STEWARZII CE AU ASIGURAT FIECARE CURSĂ
+select nume, prenume
+from steward
+where not exists (select * from steward_asigura_curse sc where not exists (select * from steward_asigura_curse sc2 where sc2.cod_steward = sc.cod_steward));
+
+
+
+
+
+
+
+--SĂ SE SELECTEZE TOȚI STEWARZII CE AU ASIGURAT FIECARE CURSĂ
+select * 
+from ingineri_echipe_curse iec left outer join ingineri i  on i.cod_inginer = iec.cod_inginer
+                               right outer join curse c on iec.cod_cursa = c.cod_cursa
+                               right outer join echipe e on iec.cod_echipa = e.cod_echipa
+where lower(e.nume) like '%o%';
+
+
+
+select c.cod_echipa, e.nume
+from contract c ,echipe e, ( select p.* from PILOT p
+                 where p.podium=3
+                 union 
+                 select p.* from PILOT p 
+                 where p.podium=5) aux
+          where c.cod_pilot=aux.cod_pilot and c.cod_echipa=e.cod_echipa;
+          
+          
+select c.cod_echipa, e.nume
+from contract c ,echipe e, ( select p.* from PILOT p
+                 where p.podium=3 or p.podium=5) aux
+          where c.cod_pilot=aux.cod_pilot and c.cod_echipa=e.cod_echipa;
